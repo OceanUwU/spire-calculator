@@ -10,20 +10,10 @@ import spirecalculator.ui.Calculator;
 import spirecalculator.ui.PanelItem;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 
 @SpireInitializer
 public class SpireCalculator implements PostInitializeSubscriber {
     public static ArrayList<Calculator> calculators = new ArrayList<>();
-    public static ArrayList<Color> colors = new ArrayList<>(Arrays.asList(
-        Color.WHITE,
-        Color.CYAN,
-        Color.CHARTREUSE,
-        Color.PINK,
-        Color.YELLOW,
-        Color.GOLD,
-        Color.VIOLET
-    ));
 
     public static void initialize() {
         BaseMod.subscribe(new SpireCalculator());
@@ -34,7 +24,7 @@ public class SpireCalculator implements PostInitializeSubscriber {
     }
 
     public static void openCalculator(float x, float y) {
-        calculators.add(new Calculator(x, y, colors.get((int)(Math.random() * colors.size()))));
+        calculators.add(new Calculator(x, y));
     }
 
     public static void closeCalculators() {

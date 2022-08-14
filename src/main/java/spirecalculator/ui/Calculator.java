@@ -13,6 +13,7 @@ import com.megacrit.cardcrawl.helpers.ImageMaster;
 import com.megacrit.cardcrawl.helpers.input.InputHelper;
 import spirecalculator.SpireCalculator;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
@@ -25,6 +26,7 @@ public class Calculator implements RenderSubscriber, PreUpdateSubscriber {
     private static ScriptEngineManager manager = new ScriptEngineManager();
     private static ScriptEngine engine = manager.getEngineByName("js");
     private static BitmapFont font = FontHelper.cardTypeFont;
+    private static DecimalFormat df = new DecimalFormat("#.##");
 
     private Hitbox hb;
     private float x, y;
@@ -32,11 +34,14 @@ public class Calculator implements RenderSubscriber, PreUpdateSubscriber {
     private String expression = "";
     private float startX, startY;
     public Color color;
+    public boolean dark;
+    private String result = "0";
 
-    public Calculator(float xLoc, float yLoc, Color calcColor) {
+    public Calculator(float xLoc, float yLoc) {
         x = xLoc - (width / 2);
         y = yLoc - height;
-        color = calcColor;
+        color = new Color((float)Math.random(), (float)Math.random(), (float)Math.random(), 1.0f);
+        dark = (0.2126f * color.r + 0.7152f * color.g + 0.0722f * color.b) < 0.4f;
         hb = new Hitbox(x, y, width, height);
 
         int index = 0;
@@ -64,16 +69,27 @@ public class Calculator implements RenderSubscriber, PreUpdateSubscriber {
         BaseMod.unsubscribeLater(this);
     }
 
-    public void addToExpr(String text) {
+    public void addToExpr(String text, boolean isNum) {
         if (expression.contains("="))
-            expression = "";
+            expression = isNum ? "" : result;
         expression += text;
     }
 
     public void evaluate() {
         try {
-            if (!expression.contains("="))
-                expression += "=" + engine.eval(expression);
+            if (!expression.contains("=")) {
+                Object engineResult = engine.eval(expression);
+                if (engineResult instanceof Integer) {
+                    result = Integer.toString((int)engineResult);
+                } else {
+                    double num = (double)engine.eval(expression);
+                    if ((Math.floor(num) - num) > 0)
+                        result = String.valueOf((int)num);
+                    else
+                        result = df.format(num);
+                }
+                expression += "=" + result;
+            }
         } catch(Exception e) {
             e.printStackTrace();
             expression += "=" + "ERR";
@@ -82,14 +98,20 @@ public class Calculator implements RenderSubscriber, PreUpdateSubscriber {
 
     public void pressButton(int type) {
         switch(type) {
-            case 0: case 3:
-            case 4: case 5: case 6: case 7:
-            case 8: case 9: case 10: case 11:
-            case 12: case 13: case 14: case 15:
-            case 16: case 17:
-                addToExpr(Button.texts.get(type));
+            case 0:
+            case 4: case 5: case 6:
+            case 8: case 9: case 10:
+            case 12: case 13: case 14:
+                addToExpr(Button.texts.get(type), true);
                 break;
-            case 1: addToExpr(".");
+            case 3:
+            case 7:
+            case 11:
+            case 15:
+            case 16: case 17:
+                addToExpr(Button.texts.get(type), false);
+                break;
+            case 1: addToExpr(".", true);
                 break;
             case 18:
                 if (expression.length() > 0)
@@ -134,7 +156,7 @@ public class Calculator implements RenderSubscriber, PreUpdateSubscriber {
 
         if (expression.length() > 0) {
             font.getData().setScale(Math.min(displayWidth / FontHelper.getWidth(font, expression, 1.0f) * 2.5f, 3.0f));
-            FontHelper.renderFontRightAligned(sb, font, expression, x+width-18, y+height-69, Color.BLACK);
+            FontHelper.renderFontRightAligned(sb, font, expression, x+width-18, y+height-69, dark ? Color.WHITE : Color.BLACK);
         }
     }
 }

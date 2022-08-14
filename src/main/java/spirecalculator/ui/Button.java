@@ -1,6 +1,7 @@
 package spirecalculator.ui;
 
 import basemod.BaseMod;
+import basemod.interfaces.PostUpdateSubscriber;
 import basemod.interfaces.PreUpdateSubscriber;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
@@ -14,7 +15,7 @@ import com.megacrit.cardcrawl.helpers.input.InputHelper;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-public class Button implements PreUpdateSubscriber {
+public class Button implements PreUpdateSubscriber, PostUpdateSubscriber {
     private static Texture texture = ImageMaster.loadImage("spirecalculator/button.png");
     private static int width = 64, height = 64;
     public static ArrayList<String> texts = new ArrayList<>(Arrays.asList(
@@ -23,6 +24,7 @@ public class Button implements PreUpdateSubscriber {
     private static BitmapFont font = FontHelper.cardTypeFont;
     public static Color hoveredMult = new Color(0.9F, 0.9F, 0.9F, 1.0F);
     public static Color pressedMult = new Color(0.7F, 0.7F, 0.7F, 1.0F);
+    public static boolean anyPressed = false;
 
     public Hitbox hb;
     public float x, y, xOffset, yOffset;
@@ -50,16 +52,20 @@ public class Button implements PreUpdateSubscriber {
         y = newY + yOffset;
         hb.translate(x, y);
     }
-
     
     public void receivePreUpdate() {
         hb.update();
         if (hb.hovered && InputHelper.justClickedLeft)
             hb.clickStarted = true;
         if (hb.clicked) {
+            anyPressed = true;
             calculator.pressButton(type);
             hb.clicked = false;
         }
+    }
+    
+    public void receivePostUpdate() {
+        anyPressed = false;
     }
 
     public void render(SpriteBatch sb, Color color) {
@@ -70,6 +76,6 @@ public class Button implements PreUpdateSubscriber {
         sb.draw(texture, x, y);
 
         font.getData().setScale(2.5f);
-        FontHelper.renderFontCentered(sb, font, text, x + (width/2), y + (height/2), Color.BLACK);
+        FontHelper.renderFontCentered(sb, font, text, x + (width/2), y + (height/2), calculator.dark ? Color.WHITE : Color.BLACK);
     }
 }

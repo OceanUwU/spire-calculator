@@ -14,6 +14,6 @@ public class PanelItem extends TopPanelItem {
 
     @Override
     protected void onClick() {
-        SpireCalculator.openCalculator(this.x + (hb_w / 2), this.y - 100);
+        SpireCalculator.openCalculator(this.x + (hb_w / 2) + (int)(Math.random() * 21) - 10, this.y - 100 + (int)(Math.random() * 21) - 10);
     }
 }
