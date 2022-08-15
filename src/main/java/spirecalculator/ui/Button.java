@@ -5,7 +5,6 @@ import basemod.interfaces.PostUpdateSubscriber;
 import basemod.interfaces.PreUpdateSubscriber;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.megacrit.cardcrawl.helpers.FontHelper;
 import com.megacrit.cardcrawl.helpers.Hitbox;
@@ -21,7 +20,6 @@ public class Button implements PreUpdateSubscriber, PostUpdateSubscriber {
     public static ArrayList<String> texts = new ArrayList<>(Arrays.asList(
         "0", "•", "=", "+", "1", "2", "3", "-", "4", "5", "6", "*", "7", "8", "9", "/", "(", ")", "<", "C", "x"
     ));
-    private static BitmapFont font = FontHelper.cardTypeFont;
     public static Color hoveredMult = new Color(0.9F, 0.9F, 0.9F, 1.0F);
     public static Color pressedMult = new Color(0.7F, 0.7F, 0.7F, 1.0F);
     public static boolean anyPressed = false;
@@ -75,7 +73,7 @@ public class Button implements PreUpdateSubscriber, PostUpdateSubscriber {
             sb.setColor(calculator.color.cpy().mul(hoveredMult));
         sb.draw(texture, x, y);
 
-        font.getData().setScale(2.5f);
-        FontHelper.renderFontCentered(sb, font, text, x + (width/2), y + (height/2), calculator.dark ? Color.WHITE : Color.BLACK);
+        Calculator.font.getData().setScale(0.9f);
+        FontHelper.renderFontCentered(sb, Calculator.font, text, x + (width/2), y + (height/2), calculator.dark ? Color.WHITE : Color.BLACK);
     }
 }
